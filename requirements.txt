@@ -1,0 +1,11 @@
+fastapi==0.118.0
+uvicorn[standard]==0.37.0
+pydantic==2.11.9
+httpx==0.28.1
+requests==2.32.3
+faster-whisper==1.2.0
+google-genai==1.46.0
+python-multipart==0.0.20
+
+# Only needed if LLM_PROVIDER=anthropic
+# anthropic==0.69.0
