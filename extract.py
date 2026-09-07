@@ -101,28 +101,70 @@ def extract_note(transcript: str) -> ProposedNote:
 
 
 def _generate_gemini(system: str, user: str) -> str:
+    import time
+
     from google import genai
     from google.genai import types
 
     # Reads GEMINI_API_KEY from the environment.
     client = genai.Client()
 
-    response = client.models.generate_content(
-        model=MODEL,
-        contents=user,
-        config=types.GenerateContentConfig(
-            system_instruction=system,
-            # Near-zero temperature: this is extraction, and variation
-            # between runs on the same audio is a defect, not a feature.
-            temperature=0,
-            max_output_tokens=2000,
-            # Constrains the decoder to emit valid JSON, which removes a
-            # whole class of parse failure before it happens.
-            response_mime_type="application/json",
-        ),
+    config = types.GenerateContentConfig(
+        system_instruction=system,
+        # Near-zero temperature: this is extraction, and variation
+        # between runs on the same audio is a defect, not a feature.
+        temperature=0,
+        max_output_tokens=4000,
+        # Constrains the decoder to emit valid JSON, which removes a
+        # whole class of parse failure before it happens.
+        response_mime_type="application/json",
     )
 
-    return response.text or ""
+    # The free tier returns 503 under load often enough that a single
+    # attempt is not a fair test of the model. Retry with backoff so an
+    # evaluation run measures extraction quality rather than Google's
+    # capacity on the afternoon you happened to run it.
+    last_error: Exception | None = None
+    for attempt in range(4):
+        try:
+            response = client.models.generate_content(
+                model=MODEL, contents=user, config=config
+            )
+            text = _text_from(response)
+            if text.strip():
+                return text
+            last_error = RuntimeError("Model returned no text")
+        except Exception as exc:  # noqa: BLE001 - retried below
+            last_error = exc
+            if "503" not in str(exc) and "UNAVAILABLE" not in str(exc):
+                raise
+        time.sleep(2 ** attempt)
+
+    raise RuntimeError(f"Gemini failed after retries: {last_error}")
+
+
+def _text_from(response) -> str:
+    """
+    Pulls text out of a response that may also contain thinking parts.
+
+    Newer Gemini models return reasoning alongside the answer, and
+    `response.text` warns when it has to skip non-text parts. Reading the
+    parts directly avoids the warning and, more importantly, avoids
+    returning an empty string when the model spent its whole output
+    budget thinking.
+    """
+    if getattr(response, "text", None):
+        return response.text
+
+    parts = []
+    for candidate in getattr(response, "candidates", []) or []:
+        content = getattr(candidate, "content", None)
+        for part in getattr(content, "parts", []) or []:
+            if getattr(part, "thought", False):
+                continue
+            if getattr(part, "text", None):
+                parts.append(part.text)
+    return "".join(parts)
 
 
 def _generate_anthropic(system: str, user: str) -> str:

@@ -1,0 +1,27 @@
+{
+  "notes": "Two drugs in one consultation, with the doses given at different points in the conversation rather than together. Tests whether the model keeps drug/dose pairs correctly associated instead of mixing them up.",
+  "transcript": "So Daisy's ears have been bothering her again, she's shaking her head a lot and there's a smell. Right, let me have a look in there. Yes, that's quite inflamed, and there's a fair bit of brown discharge in the left one. Right ear looks better but not clear. Has she been swimming? She was in the river about ten days ago. That'll be it. This looks like a bacterial otitis, quite typical after water gets in. I'm going to give you two things. First is an ear cleaner, you'll use that twice a day to flush the canal before anything else goes in. And then drops, that's the enrofloxacin, four drops into the left ear twice daily. Do both ears? No, just the left for the drops, but clean both. How long? Fourteen days on the drops. And I'll also do a short course of meloxicam for the inflammation, that's two milligrams once a day, five days. Bring her back in two weeks and I'll re-check the canal.",
+  "expected": {
+    "presenting_complaint": "Head shaking and odour from the ears, recurrent. Swam in a river approximately ten days ago.",
+    "examination": "Left ear canal inflamed with brown discharge. Right ear less affected but not clear.",
+    "assessment": "Bacterial otitis externa, likely secondary to water exposure.",
+    "plan": "Ear cleaner twice daily to flush both canals before drops. Enrofloxacin drops to left ear. Short course of meloxicam for inflammation. Re-check canal in two weeks.",
+    "follow_up": "Re-check in two weeks.",
+    "medications": [
+      {
+        "drug": "enrofloxacin",
+        "dose": "4 drops",
+        "frequency": "twice daily",
+        "duration_days": 14,
+        "instructions": "left ear only"
+      },
+      {
+        "drug": "meloxicam",
+        "dose": "2 mg",
+        "frequency": "once daily",
+        "duration_days": 5,
+        "instructions": null
+      }
+    ]
+  }
+}

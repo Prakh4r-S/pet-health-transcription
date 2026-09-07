@@ -1,0 +1,12 @@
+{
+  "notes": "Urgent case where the vet refers rather than treats. Tests that plan captures the referral and that no medication is invented — the temptation is to fill medications with something plausible for the presentation.",
+  "transcript": "Okay, I need you to listen carefully. What you're describing — the retching without bringing anything up, the swollen abdomen, the restlessness — that combination in a deep chested dog like a great dane is a possible GDV. That's a twisting of the stomach and it is a genuine emergency. How long has this been going on? About an hour, maybe a bit more. Right. I want you to stop this call now and take him straight to the emergency hospital on Fielding Road. Do not wait, do not give him anything to eat or drink, and don't try to make him vomit. I'm going to ring ahead so they know you're coming. If this is what I think it is he needs surgery tonight and every minute counts. Have you got someone to drive? Yes my husband's here. Good. Go now.",
+  "expected": {
+    "presenting_complaint": "Non-productive retching, abdominal distension and restlessness for approximately one hour in a deep-chested breed.",
+    "examination": null,
+    "assessment": "Suspected gastric dilatation-volvulus. Surgical emergency.",
+    "plan": "Immediate referral to emergency hospital on Fielding Road. Nil by mouth, do not induce vomiting. Referring practice to telephone ahead.",
+    "follow_up": null,
+    "medications": []
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "notes": "RECORD THIS ONE — script 17. Two animals present, one patient. The record is for Poppy; Milo is context and must not contaminate the findings. A model that writes 'both animals examined' has failed.",
+  "transcript": "",
+  "expected": {
+    "presenting_complaint": "Discharge from the left eye for four days, with rubbing of the face against the carpet.",
+    "examination": "Left eye with green discharge and conjunctival hyperaemia. Fluorescein stain negative, no corneal ulceration. Right eye unremarkable.",
+    "assessment": "Conjunctivitis of the left eye. No corneal involvement.",
+    "plan": "Chloramphenicol ointment to the left eye. Hand hygiene between animals in the household. Re-present if not improving within five days.",
+    "follow_up": "Return in five days if no improvement.",
+    "medications": [
+      {
+        "drug": "chloramphenicol",
+        "dose": "small amount",
+        "frequency": "four times daily",
+        "duration_days": 7,
+        "instructions": "left eye only"
+      }
+    ]
+  }
+}

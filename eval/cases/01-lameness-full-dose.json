@@ -1,0 +1,20 @@
+{
+  "notes": "Straightforward lameness case. Everything needed is stated aloud, including a full dose. Baseline: if this one scores badly, something is wrong with the prompt rather than the transcript.",
+  "transcript": "Right, so tell me what's been going on with Bruno. He's been limping on his back left leg since about Tuesday, so three days now. He's still eating fine and he's happy in himself, just doesn't want to jump up on the sofa. Okay, can you hold him steady and let me see him walk across. Yes, I can see he's not weight bearing fully on that left hind. Is there any swelling if you feel around the ankle joint? A little bit maybe, it feels a bit puffy compared to the other side. No heat though? No, feels normal temperature. Alright. I think this is most likely a soft tissue strain rather than anything structural, given he's not in obvious pain and there's no heat. What I'd like to do is start him on meloxicam, that's an anti-inflammatory. One and a half milligrams once daily, with food, for five days. Keep him on lead walks only, no running or jumping. If he's not markedly better by the end of the week, bring him back in and we'll x-ray. Otherwise let's review in seven days.",
+  "expected": {
+    "presenting_complaint": "Limping on left hind leg for three days. Eating normally, bright in himself, reluctant to jump.",
+    "examination": "Not fully weight bearing on left hind. Mild swelling around the hock, no heat.",
+    "assessment": "Likely soft tissue strain. No obvious pain response or heat to suggest structural injury.",
+    "plan": "Meloxicam anti-inflammatory. Lead walks only, no running or jumping. X-ray if not improved by end of week.",
+    "follow_up": "Review in seven days.",
+    "medications": [
+      {
+        "drug": "meloxicam",
+        "dose": "1.5 mg",
+        "frequency": "once daily",
+        "duration_days": 5,
+        "instructions": "with food"
+      }
+    ]
+  }
+}

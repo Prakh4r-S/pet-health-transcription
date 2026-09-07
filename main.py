@@ -15,6 +15,7 @@ import httpx
 from fastapi import Depends, FastAPI, HTTPException, Header
 from pydantic import BaseModel, HttpUrl
 
+from chat import ChatRequest, ChatResponse, answer_question
 from extract import ProposedNote, extract_note
 from transcribe import TranscriptionResult, load_model, transcribe_file
 
@@ -100,3 +101,25 @@ async def _download(url: str) -> bytes:
         if len(response.content) > MAX_AUDIO_BYTES:
             raise HTTPException(413, "Recording too large")
         return response.content
+
+
+@app.post("/chat", response_model=ChatResponse)
+async def chat(
+    request: ChatRequest,
+    _: None = Depends(require_api_key),
+) -> ChatResponse:
+    """
+    Answers a question about a pet's records.
+
+    The context block is assembled by the calling application, which has
+    already established who is asking and filtered the data to what they
+    may see. This service does no access control of its own — it cannot,
+    having no notion of users — which is exactly why the shared secret
+    matters.
+    """
+    if not request.question.strip():
+        raise HTTPException(422, "No question given")
+    if len(request.context) > 40_000:
+        raise HTTPException(413, "Context too large")
+
+    return answer_question(request)

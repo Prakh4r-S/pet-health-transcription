@@ -1,0 +1,12 @@
+{
+  "notes": "Preventive appointment with no complaint and no prescription. Presenting complaint should be null or describe the routine nature — an invented complaint here is a hallucination. Vaccines administered are not prescriptions and should not appear in medications.",
+  "transcript": "So this is just her annual booster today. Any concerns at all since we last saw her? No, she's been great. Eating well, plenty of energy. Good. Weight is eleven point four, that's up a little from last year but nothing to worry about. Let me just check her over first. Eyes clear, ears clean, teeth are decent, a bit of tartar on the back molars but nothing needing attention yet. Heart sounds normal. Abdomen feels fine. Right, she's in good shape. I'll give the DHPP and the leptospirosis today. Slight chance she's a bit quiet this evening, that's normal. Just keep an eye on the injection site. And we'll see her again in twelve months unless anything comes up. I'd think about a dental in the next year or two but there's no urgency.",
+  "expected": {
+    "presenting_complaint": null,
+    "examination": "Weight 11.4 kg, slightly increased from previous year. Eyes clear, ears clean. Mild tartar on the caudal molars. Heart sounds normal, abdomen unremarkable.",
+    "assessment": "Healthy on examination. Early dental tartar, not currently requiring intervention.",
+    "plan": "DHPP and leptospirosis vaccinations administered. Monitor injection site. Possible lethargy this evening. Consider dental treatment within one to two years.",
+    "follow_up": "Annual booster in twelve months.",
+    "medications": []
+  }
+}

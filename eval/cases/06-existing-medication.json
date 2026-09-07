@@ -1,0 +1,20 @@
+{
+  "notes": "A chronic case where the animal is already on a drug and the vet continues it without a new prescription, then adds one new drug. Tests whether the model distinguishes 'already taking' from 'newly prescribed'. Only gabapentin should appear.",
+  "transcript": "How's he been getting on with the arthritis? Up and down. The librela injections are definitely helping, he's more mobile after each one, but he still has bad mornings. And he's on the librela monthly, is that right? Yes, next one's due in about ten days. Good, keep that going. Any change in appetite or drinking? No, all normal. Right, let me feel those hips. Yes, there's a reduced range on the right, similar to last time, maybe slightly worse. He's not vocalising though. Okay. I think what would help is adding something for the nerve component of the pain, which the injections don't really touch. I'd like to start gabapentin, one hundred milligrams twice a day, and we can go up if he tolerates it. Start that and give it three weeks, then let me know how the mornings are.",
+  "expected": {
+    "presenting_complaint": "Arthritis follow-up. Variable mobility, improvement after each injection but persistent difficulty in the mornings. Appetite and drinking normal.",
+    "examination": "Reduced range of movement in the right hip, similar to or slightly worse than previous. No vocalisation on manipulation.",
+    "assessment": "Osteoarthritis with a neuropathic pain component not addressed by current treatment.",
+    "plan": "Continue monthly librela, next dose due in approximately ten days. Add gabapentin, with scope to increase if tolerated.",
+    "follow_up": "Review after three weeks.",
+    "medications": [
+      {
+        "drug": "gabapentin",
+        "dose": "100 mg",
+        "frequency": "twice daily",
+        "duration_days": null,
+        "instructions": "may increase if tolerated"
+      }
+    ]
+  }
+}

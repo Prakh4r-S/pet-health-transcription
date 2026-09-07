@@ -1,0 +1,20 @@
+{
+  "notes": "The vet states a dose, then corrects it. The correction is what should be recorded. Models often take the first number they see. If the extraction says 0.5 mg here it has failed in a way that would be dangerous in production.",
+  "transcript": "Right, her weight's down to three point two kilos which is what I want to see. Bloods came back and the thyroid level is still high, so we do need to keep going with the treatment. She's on the methimazole at the moment. I'm going to increase that. Let's go to two point five milligrams — sorry, no, that's too big a jump for her. Two milligrams twice daily. Two milligrams, twice a day. Write that down. And I want to recheck the bloods in four weeks, because if we push the dose too fast we can tip her the other way. Any vomiting on the current dose? A bit at the start but not now. Good, that usually settles.",
+  "expected": {
+    "presenting_complaint": "Hyperthyroidism follow-up. Weight now 3.2 kg. Some vomiting when treatment started, since resolved.",
+    "examination": null,
+    "assessment": "Thyroid level remains elevated on current dose. Weight trend satisfactory.",
+    "plan": "Increase methimazole dose. Recheck bloods in four weeks to avoid overshooting.",
+    "follow_up": "Bloods in four weeks.",
+    "medications": [
+      {
+        "drug": "methimazole",
+        "dose": "2 mg",
+        "frequency": "twice daily",
+        "duration_days": null,
+        "instructions": null
+      }
+    ]
+  }
+}

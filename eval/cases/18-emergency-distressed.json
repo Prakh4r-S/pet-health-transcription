@@ -1,0 +1,12 @@
+{
+  "notes": "RECORD THIS ONE — script 18, read fast and upset with overlapping speech. Sparse clinical content buried in an emotional exchange, and the transcript will be messy. Tests extraction of the triage findings without inventing an examination that never happened over the phone.",
+  "transcript": "",
+  "expected": {
+    "presenting_complaint": "Road traffic accident. Owner reports tachypnoea, responsiveness to name, and oozing haemorrhage from a hind leg.",
+    "examination": null,
+    "assessment": "Road traffic trauma. Conscious and breathing on owner report; haemorrhage described as oozing rather than arterial.",
+    "plan": "Immediate presentation, approximately ten minutes away. Minimise movement, apply gentle direct pressure to the bleeding limb with a towel. Nil by mouth, no analgesia to be given by the owner. Team to prepare for direct admission.",
+    "follow_up": null,
+    "medications": []
+  }
+}

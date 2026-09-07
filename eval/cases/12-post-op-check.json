@@ -1,0 +1,12 @@
+{
+  "notes": "Short, examination-heavy, mostly reassurance. Plan is minimal. Tests behaviour on a sparse transcript where over-writing is the risk — a model that produces four full paragraphs from this has padded.",
+  "transcript": "Right, let's have a look at that wound. Hold still. Yes, that's healing very nicely. No discharge, no swelling, edges are clean and together. Has she been licking it? Not since we got the collar on properly. Good. Sutures can come out in three days, so book that in on your way out. Until then keep the collar on and no off lead running. She's been on the antibiotics? Finished them yesterday, all of them. Perfect, nothing more needed on that front. She looks well in herself. Any questions? No, she's been much brighter than I expected. Good. See you Thursday for the sutures.",
+  "expected": {
+    "presenting_complaint": null,
+    "examination": "Surgical wound healing well. No discharge or swelling, wound edges clean and apposed. No licking since collar fitted correctly.",
+    "assessment": "Satisfactory post-operative healing.",
+    "plan": "Suture removal in three days. Continue collar and restrict to lead exercise until then. Antibiotic course completed, no further medication required.",
+    "follow_up": "Suture removal Thursday.",
+    "medications": []
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "notes": "RECORD THIS ONE — see eval/recording-scripts.md, script 13. Paste the raw Whisper output into transcript below, unedited. Tests dosing expressed per kilogram; the model must keep the mg/kg figure and the computed absolute dose straight, and not silently convert one into the other.",
+  "transcript": "",
+  "expected": {
+    "presenting_complaint": "Itching for approximately three weeks affecting the abdomen and front paws, with chewing at the front feet. No dietary change.",
+    "examination": "Weight 22.4 kg, increased from 21 kg previously. Erythema between the pads of both front feet. Inflamed, pink skin on the abdomen. No fleas seen.",
+    "assessment": "Atopic dermatitis. Distribution of paws and ventral abdomen is typical.",
+    "plan": "Start ciclosporin, dosed at 5 mg/kg. Administer on an empty stomach one hour before food, as absorption is reduced when given with a meal. Full effect expected at four to six weeks.",
+    "follow_up": "Review in one month.",
+    "medications": [
+      {
+        "drug": "ciclosporin",
+        "dose": "112 mg",
+        "frequency": "once daily",
+        "duration_days": null,
+        "instructions": "on an empty stomach, one hour before food"
+      }
+    ]
+  }
+}

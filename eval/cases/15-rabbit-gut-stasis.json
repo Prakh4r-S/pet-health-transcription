@@ -1,0 +1,20 @@
+{
+  "notes": "RECORD THIS ONE — script 15. A species other than dog or cat, with vocabulary Whisper handles less well: 'gut stasis', 'molar spurs', 'critical care'. Expect transcription errors here, which is the point. Also weight-based dosing again, in a small animal where the absolute figure is under 2 mg.",
+  "transcript": "",
+  "expected": {
+    "presenting_complaint": "Anorexic since the previous evening. Reduced and undersized faecal output. Hunched posture, not emerging from the hutch as normal.",
+    "examination": "Hunched posture consistent with pain. Abdomen doughy on palpation with no detectable gut motility. Spurring on the lower left molars. Weight 2.1 kg.",
+    "assessment": "Gastrointestinal stasis, likely secondary to dental pain from molar spurs.",
+    "plan": "Subcutaneous fluids. Meloxicam for analgesia at 0.6 mg/kg. Syringe feeding with critical care formula every four hours including overnight, as much as tolerated. Burr molar spurs under sedation tomorrow if stable.",
+    "follow_up": "Re-present tomorrow for dental burring under sedation.",
+    "medications": [
+      {
+        "drug": "meloxicam",
+        "dose": "1.3 mg",
+        "frequency": "once daily",
+        "duration_days": null,
+        "instructions": null
+      }
+    ]
+  }
+}

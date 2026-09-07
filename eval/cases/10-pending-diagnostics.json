@@ -1,0 +1,12 @@
+{
+  "notes": "Assessment is deliberately withheld pending test results. A model that produces a confident diagnosis here has invented one — the vet explicitly declines to give it. Tests restraint on the field where hallucination is most tempting.",
+  "transcript": "She's lost quite a lot of weight, hasn't she. What was she before? Five and a half, and today she's four point six. That's over fifteen percent, which is significant in a cat her age. Is she eating? That's the strange thing, she's eating more than she used to. Drinking? Yes, a lot more, I'm filling the bowl twice a day now. Right. Increased appetite, increased thirst, weight loss — there are three or four things that could be, and they need different treatment, so I don't want to guess. Coat's a bit unkempt. Thyroid, I can feel a slightly enlarged gland on the left. Heart rate is fast, two hundred and ten. What I want to do is take blood today and run a full panel including thyroid and glucose, and a urine sample if you can get one. I should have results tomorrow afternoon and I'll ring you. I'm not starting any treatment until I know what I'm treating.",
+  "expected": {
+    "presenting_complaint": "Weight loss from 5.5 kg to 4.6 kg with increased appetite and increased thirst.",
+    "examination": "Coat unkempt. Slightly enlarged thyroid gland palpable on the left. Heart rate 210 bpm.",
+    "assessment": null,
+    "plan": "Full blood panel including thyroid and glucose, plus urinalysis if a sample can be obtained. No treatment until results are available. Results expected tomorrow afternoon, practice to telephone.",
+    "follow_up": "Telephone with results tomorrow afternoon.",
+    "medications": []
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "notes": "Deliberately degraded, the way a real Whisper output looks on a bad connection. The drug name is garbled ('metro nid azole') and one number is ambiguous. A good extraction recovers the drug but flags the uncertainty; a bad one confidently picks a dose. Rebuild this case from an actual noisy recording if you can — synthetic noise is not quite the same shape as the real thing.",
+  "transcript": "So she's had diarrhoea since Saturday, quite watery, no blood that I've seen. Is she drinking? Yeah, drinking normally, maybe a bit more than usual. And eating? Off her food a bit but she's had some chicken and rice. Okay that's reasonable. Any vomiting? No vomiting. Right, abdomen feels soft, no pain when I press here, she's not reacting at all. Temperature is normal. I think it's most likely a dietary upset or a mild gastroenteritis. I'll give her some metro nid azole for that, and keep her on the chicken and rice for now, small meals, four or five times a day. Sorry, how many days on the tablets? Let's do it for, I think five days should be enough, maybe seven if she's still loose. Come back to me if there's blood or if she stops drinking.",
+  "expected": {
+    "presenting_complaint": "Watery diarrhoea since Saturday, no blood observed. Drinking normally or slightly increased. Reduced appetite, tolerating chicken and rice. No vomiting.",
+    "examination": "Abdomen soft, non-painful on palpation. Temperature normal.",
+    "assessment": "Likely dietary upset or mild gastroenteritis.",
+    "plan": "Metronidazole. Continue chicken and rice, small meals four to five times daily. Return if blood appears or she stops drinking.",
+    "follow_up": null,
+    "medications": [
+      {
+        "drug": "metronidazole",
+        "dose": null,
+        "frequency": null,
+        "duration_days": 5,
+        "instructions": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "notes": "RECORD THIS ONE — script 16, and actually cut the recording at the marked point. Tests whether the model stays honest about a gap. The dehydration finding is restated after the cut so it should survive; anything the model adds beyond what is recoverable is invention. Assessment is deliberately withheld pending imaging.",
+  "transcript": "",
+  "expected": {
+    "presenting_complaint": "Worsening breathing overnight with an expiratory rasp.",
+    "examination": "Crackles in both lung fields, worse on the left. Heart rate 160 bpm. Gums tacky, indicating mild dehydration.",
+    "assessment": null,
+    "plan": "Chest radiographs today before committing to treatment, as pneumonia and cardiac failure present similarly but require opposite management. Patient to be admitted for the morning.",
+    "follow_up": "Practice to telephone once radiographs have been reviewed.",
+    "medications": []
+  }
+}

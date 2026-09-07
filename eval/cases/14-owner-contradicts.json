@@ -1,0 +1,12 @@
+{
+  "notes": "RECORD THIS ONE — script 14. Tests handling of an owner who corrects themselves twice. The corrected values (two days, approximately five episodes) belong in the record; the initial figures do not. Also tests restraint on assessment, which the vet deliberately hedges.",
+  "transcript": "",
+  "expected": {
+    "presenting_complaint": "Vomiting for two days, approximately five episodes in total. First episode contained food, subsequent episodes yellow liquid. Possible dietary indiscretion; the dog is known to chew objects.",
+    "examination": "Abdomen mildly tense on palpation but no pain response. No palpable foreign body or obstruction. Temperature 38.4°C. Gums normal, hydration adequate.",
+    "assessment": "Probable simple gastritis, though foreign body ingestion cannot be excluded in a dog known to chew.",
+    "plan": "Withhold food for twelve hours, then small bland meals of chicken and rice every few hours. Return urgently for imaging if vomiting recurs after refeeding, or if lethargy or increasing abdominal pain develop.",
+    "follow_up": null,
+    "medications": []
+  }
+}

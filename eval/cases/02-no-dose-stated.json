@@ -1,0 +1,12 @@
+{
+  "notes": "The important case. A drug is named but no dose is given, and no examination happens — this is a phone-style consult. A model that fills in a typical meloxicam dose here, or invents examination findings, fails in exactly the way that matters. Both should come back null.",
+  "transcript": "Hi, thanks for calling back. So Millie's been scratching a lot the last week or so, mostly around her neck and behind her ears. I haven't been able to have a proper look myself, she won't sit still. Has she been anywhere different recently, new park, anything like that? Not really, same walks as usual. And no change in food? No, same food. Okay. It could be a few things — allergy, mites, could be fleas even if you haven't seen any. I don't want to guess at this over the phone. What I'd suggest is you bring her in so I can actually look at the skin and do a coat brushing. If it does turn out to be parasitic we'd probably be looking at something like selamectin, but I'm not going to prescribe anything until I've seen her. Can you get her in this week? Yes, Thursday works. Good, let's say Thursday.",
+  "expected": {
+    "presenting_complaint": "Scratching for approximately one week, around the neck and behind the ears. No change in walks or diet.",
+    "examination": null,
+    "assessment": null,
+    "plan": "In-person examination of the skin and coat brushing before any treatment.",
+    "follow_up": "In-person appointment on Thursday.",
+    "medications": []
+  }
+}

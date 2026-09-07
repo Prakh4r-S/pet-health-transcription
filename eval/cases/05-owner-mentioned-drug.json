@@ -1,0 +1,12 @@
+{
+  "notes": "The owner says they gave the animal a human medication. It must NOT appear as a prescription — the vet did not prescribe it, and the vet explicitly says not to. A model that lists paracetamol here has confused 'mentioned' with 'prescribed', which is the failure this case exists to catch.",
+  "transcript": "He's been quite subdued since yesterday evening, not himself at all. I gave him a bit of paracetamol last night because I thought he was in pain, was that alright? No, please don't do that again — paracetamol is toxic to dogs, even small amounts. How much did you give him? Just half a tablet, a 500. Okay. For a dog his size that's probably below the level where we'd worry, but I want you to watch him closely. Any vomiting since? No, nothing. Gums look a normal colour, that's reassuring. Right, I'm not going to prescribe anything today. What I want is for you to monitor him overnight, and if he vomits, goes off his food, or the gums look pale or muddy at all, you ring the emergency line immediately. Don't wait until morning. Otherwise bring him in tomorrow and we'll do bloods to check the liver.",
+  "expected": {
+    "presenting_complaint": "Subdued since the previous evening. Owner administered half a 500 mg paracetamol tablet.",
+    "examination": "Gums normal colour. No vomiting reported.",
+    "assessment": "Paracetamol ingestion, likely below the toxic threshold for this dog's weight. Monitoring indicated.",
+    "plan": "No medication prescribed. Owner to monitor overnight and contact the emergency line if vomiting, inappetence, or pale or muddy gums develop. Bloods tomorrow to check liver.",
+    "follow_up": "Bloods tomorrow.",
+    "medications": []
+  }
+}

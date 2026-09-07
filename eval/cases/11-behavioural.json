@@ -1,0 +1,12 @@
+{
+  "notes": "Behavioural consult with no physical examination and no medication. Long, discursive transcript with a lot of owner narrative — tests whether the model extracts the clinically relevant thread rather than summarising the whole conversation.",
+  "transcript": "It started after the building work next door, I think. He was always a nervous dog but this is different. Now any loud noise and he's under the bed shaking, sometimes for hours. We had fireworks in November and he was inconsolable, wouldn't come out for a whole evening. And now it's got to the point where a door slamming sets him off. Is he eating and toileting normally? Eating fine. He has had a couple of accidents indoors which he never used to. Always during an episode? Yes, now you say it, yes. That's consistent with a fear response rather than anything physical. Is there anywhere he goes that seems to help? He likes the cupboard under the stairs. Good, that's useful. I'm not going to examine him today, he's clearly stressed just being here and I don't want to add to that. What I'd recommend is a proper behavioural referral rather than medication as a first step. Make that cupboard into a permanent safe space, blankets, leave it open always. There's a desensitisation programme using recorded sounds that's genuinely effective but it needs doing properly with guidance. I'll write a referral to the behaviourist. If we get to a point where she thinks medication would help alongside that, we can revisit it then.",
+  "expected": {
+    "presenting_complaint": "Noise phobia that worsened following nearby building work. Hiding and trembling for prolonged periods in response to loud noises, now triggered by a door slamming. House soiling during episodes. Eating normally.",
+    "examination": null,
+    "assessment": "Fear response rather than physical illness. House soiling occurs only during episodes.",
+    "plan": "Referral to a behaviourist. Establish the cupboard under the stairs as a permanent safe space. Sound desensitisation programme under professional guidance. Medication not indicated as a first step; revisit if the behaviourist advises.",
+    "follow_up": null,
+    "medications": []
+  }
+}
