@@ -2,7 +2,8 @@
 Measures how well the extraction step turns transcripts into notes.
 
 Run:  python eval/run_eval.py
-      python eval/run_eval.py --provider gemini --model gemini-3.6-flash
+      python eval/run_eval.py --model gemini-3.6-flash
+      python eval/run_eval.py --provider mock     (no API key; checks the harness)
 
 Each case in eval/cases/ pairs a transcript with the extraction a vet
 would consider correct. Writing those by hand is the tedious, unglamorous
@@ -151,7 +152,11 @@ def score_case(predicted: ProposedNote, expected: dict, totals: Totals, name: st
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--provider", default=os.environ.get("LLM_PROVIDER", "gemini"))
+    parser.add_argument(
+        "--provider",
+        default=os.environ.get("LLM_PROVIDER", "gemini"),
+        choices=["gemini", "mock"],
+    )
     parser.add_argument("--model", default=os.environ.get("EXTRACTION_MODEL"))
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()

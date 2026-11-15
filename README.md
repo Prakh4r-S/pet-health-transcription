@@ -31,10 +31,11 @@ rather than trusting the extraction.
 vet examines the animal, and Whisper is prone to hallucinating text over
 silence. VAD filtering removes those gaps before transcription.
 
-**Swappable extraction model.** `LLM_PROVIDER` selects between Gemini,
-Anthropic, and a local Ollama model. All three receive the same prompt
-and go through the same parser, so extraction quality can be compared
-across providers on the same transcripts.
+**One model client, measurable output.** Extraction and chat share a
+single Gemini client with a per-request timeout. `eval/run_eval.py`
+scores extraction against hand-written expected notes, so a change of
+model or prompt can be compared on the same transcripts rather than
+judged by eye. `LLM_PROVIDER=mock` runs everything with no API key.
 
 ## Limitations
 
@@ -50,14 +51,29 @@ across providers on the same transcripts.
 
 | Variable | Purpose |
 | --- | --- |
-| `SERVICE_API_KEY` | Shared secret; requests must carry it as a bearer token |
-| `GEMINI_API_KEY` | Extraction model credentials |
-| `EXTRACTION_MODEL` | Model name, e.g. `gemini-3.6-flash` |
-| `WHISPER_MODEL` | `tiny`, `base`, `small`, `medium` (deployment uses `tiny` to fit 512 MB) |
-| `LLM_PROVIDER` | `gemini` (default), `anthropic`, `ollama` |
+| `SERVICE_API_KEY` | Shared secret; requests must carry it as a bearer token. Required — the service refuses to start without it |
+| `GEMINI_API_KEY` | Model credentials. Required unless `LLM_PROVIDER=mock` |
+| `EXTRACTION_MODEL` | Model for note extraction (default `gemini-3.6-flash`) |
+| `CHAT_MODEL` | Model for `/chat` (defaults to `EXTRACTION_MODEL`) |
+| `LLM_PROVIDER` | `gemini` (default) or `mock`, which returns canned output without calling any API |
+| `LLM_TIMEOUT_SECONDS` | Deadline for one model request (default `60`) |
+| `WHISPER_MODEL` | `tiny`, `base`, `small`, `medium` (default `base`; the Docker image bakes in `tiny`) |
 | `ALLOWED_AUDIO_HOSTS` | Comma-separated hosts recordings may be fetched from; `*.` prefix matches subdomains. Default `*.public.blob.vercel-storage.com,*.blob.vercel-storage.com` |
 | `ALLOW_LOCAL_AUDIO` | `true` permits plain HTTP and private/loopback hosts. Local testing only — never set in production |
 | `MAX_CONCURRENT_TRANSCRIPTIONS` | Whisper runs allowed at once per instance (default `2`); further requests queue |
+
+## Endpoints
+
+| Endpoint | Purpose |
+| --- | --- |
+| `POST /transcribe` | Transcribe a recording and propose a note |
+| `POST /chat` | Answer an owner's question from their records |
+| `GET /health` | Liveness — the process is up |
+| `GET /ready` | Readiness — `200` once the Whisper model is loaded, `503` while it warms up |
+
+Upstream failures are reported as such: `502` when the language model
+returns an error, `504` when it times out, `422` when the recording
+cannot be decoded as audio.
 
 This service holds no user context and makes no authorisation decisions
 of its own — the calling application establishes that the requester is
