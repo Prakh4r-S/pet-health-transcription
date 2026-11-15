@@ -88,6 +88,21 @@ with the route, status, `duration_ms`, and — where they apply —
 Transcripts, questions, record context, model output, audio URLs, and
 API keys are never logged.
 
+## Testing
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+```bash
+pytest
+```
+
+The suite needs no Whisper weights, no `GEMINI_API_KEY`, and no network:
+the model is stubbed, the language model is faked, and audio is served
+from a throwaway server on localhost. It takes about fifteen seconds,
+most of it one test that streams past the real 60 MB cap.
+
 ## Deploying to Cloud Run
 
 ```bash

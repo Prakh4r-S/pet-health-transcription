@@ -22,8 +22,12 @@ venv
 # Evaluation harness and its cases are not part of the service
 eval/
 
-# Local test artifacts
+# Tests and their tooling
 tests/
+pytest.ini
+requirements-dev.txt
+
+# Local test artifacts
 *.webm
 *.wav
 *.mp3
