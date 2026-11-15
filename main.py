@@ -7,20 +7,29 @@ proposes a structured clinical note. Everything it returns is a
 nothing here writes to the clinical record.
 """
 
+import asyncio
 import os
-import tempfile
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
-import httpx
 from fastapi import Depends, FastAPI, HTTPException, Header
 from pydantic import BaseModel, HttpUrl
 
+from audio_fetch import AudioFetchError, download_audio
 from chat import ChatRequest, ChatResponse, answer_question
 from extract import ProposedNote, extract_note
 from transcribe import TranscriptionResult, load_model, transcribe_file
 
-MAX_AUDIO_BYTES = 60 * 1024 * 1024
-DOWNLOAD_TIMEOUT_SECONDS = 120
+# Each running transcription holds the decoded PCM for a whole recording
+# in memory. Bounding how many run at once is what stops a burst of
+# requests from getting the instance OOM-killed; the rest wait their turn.
+MAX_CONCURRENT_TRANSCRIPTIONS = max(
+    1, int(os.environ.get("MAX_CONCURRENT_TRANSCRIPTIONS", "2"))
+)
+_transcription_slots = asyncio.Semaphore(MAX_CONCURRENT_TRANSCRIPTIONS)
+
+# Strong references to in-flight transcription tasks, so one whose
+# request was cancelled is not garbage-collected before it finishes.
+_transcription_tasks: set[asyncio.Task] = set()
 
 
 @asynccontextmanager
@@ -72,19 +81,24 @@ async def transcribe(
     request: TranscribeRequest,
     _: None = Depends(require_api_key),
 ) -> TranscribeResponse:
-    audio = await _download(str(request.audio_url))
+    try:
+        path = await download_audio(str(request.audio_url))
+    except AudioFetchError as exc:
+        raise HTTPException(exc.status_code, exc.detail) from exc
 
-    # NamedTemporaryFile because faster-whisper reads from a path — it
-    # shells out to ffmpeg for decoding rather than accepting bytes.
-    with tempfile.NamedTemporaryFile(suffix=".webm", delete=True) as handle:
-        handle.write(audio)
-        handle.flush()
-        result: TranscriptionResult = transcribe_file(handle.name)
+    # Shielded so that a cancelled request (client disconnect, shutdown)
+    # cannot release the slot or delete the file while the worker thread
+    # is still transcribing — threads cannot be cancelled, so the task
+    # has to outlive the request to keep the concurrency bound honest.
+    task = asyncio.create_task(_transcribe_and_cleanup(path))
+    _transcription_tasks.add(task)
+    task.add_done_callback(_transcription_tasks.discard)
+    result: TranscriptionResult = await asyncio.shield(task)
 
     if not result.text.strip():
         raise HTTPException(422, "No speech detected in the recording")
 
-    proposal = extract_note(result.text)
+    proposal = await asyncio.to_thread(extract_note, result.text)
 
     return TranscribeResponse(
         transcript=result.text,
@@ -93,14 +107,14 @@ async def transcribe(
     )
 
 
-async def _download(url: str) -> bytes:
-    async with httpx.AsyncClient(timeout=DOWNLOAD_TIMEOUT_SECONDS) as client:
-        response = await client.get(url)
-        if response.status_code != 200:
-            raise HTTPException(400, f"Could not fetch audio ({response.status_code})")
-        if len(response.content) > MAX_AUDIO_BYTES:
-            raise HTTPException(413, "Recording too large")
-        return response.content
+async def _transcribe_and_cleanup(path: str) -> TranscriptionResult:
+    """Runs Whisper in a worker thread, then always removes the audio."""
+    try:
+        async with _transcription_slots:
+            return await asyncio.to_thread(transcribe_file, path)
+    finally:
+        with suppress(OSError):
+            os.unlink(path)
 
 
 @app.post("/chat", response_model=ChatResponse)
@@ -122,4 +136,4 @@ async def chat(
     if len(request.context) > 40_000:
         raise HTTPException(413, "Context too large")
 
-    return answer_question(request)
+    return await asyncio.to_thread(answer_question, request)
