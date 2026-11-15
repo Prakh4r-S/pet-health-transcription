@@ -1,24 +1,35 @@
 """Speech-to-text using faster-whisper."""
 
-import os
-from dataclasses import dataclass, field
+import threading
 
 from faster_whisper import WhisperModel
+from faster_whisper.audio import decode_audio
+from pydantic import BaseModel
 
-# "base" runs on a modest CPU in roughly real time and is adequate for
-# clear two-person speech. "small" is noticeably better on veterinary
-# vocabulary and roughly three times slower; "medium" needs more RAM than
-# most free tiers allow. Set via env so the trade-off can be measured
-# rather than guessed at.
-MODEL_SIZE = os.environ.get("WHISPER_MODEL", "base")
+import config
 
 _model: WhisperModel | None = None
+_model_lock = threading.Lock()
 
 
-@dataclass
-class TranscriptionResult:
+class AudioDecodeError(Exception):
+    """The recording could not be decoded as audio."""
+
+
+class Segment(BaseModel):
+    start: float
+    end: float
     text: str
-    segments: list[dict] = field(default_factory=list)
+    # No speaker diarisation yet. Separating vet from owner needs
+    # pyannote, which requires a Hugging Face token and considerably more
+    # compute. Timings are kept so a proposed field can be traced back to
+    # its moment in the audio, which is most of the value.
+    speaker: str | None = None
+
+
+class TranscriptionResult(BaseModel):
+    text: str
+    segments: list[Segment] = []
     language: str | None = None
     duration: float | None = None
 
@@ -26,18 +37,41 @@ class TranscriptionResult:
 def load_model() -> WhisperModel:
     global _model
     if _model is None:
-        # int8 quantisation cuts memory roughly fourfold with a small
-        # accuracy cost — the difference between fitting on a free tier
-        # and not.
-        _model = WhisperModel(MODEL_SIZE, device="cpu", compute_type="int8")
+        # Locked because startup warms the model on a background thread
+        # while requests may already be arriving; without it two threads
+        # would each load a copy of the weights.
+        with _model_lock:
+            if _model is None:
+                # int8 quantisation cuts memory roughly fourfold with a
+                # small accuracy cost — the difference between fitting on
+                # a small instance and not.
+                _model = WhisperModel(
+                    config.whisper_model(), device="cpu", compute_type="int8"
+                )
     return _model
 
 
+def is_model_loaded() -> bool:
+    return _model is not None
+
+
 def transcribe_file(path: str) -> TranscriptionResult:
+    """Raises AudioDecodeError if the file is not decodable audio."""
+    import av
+
     model = load_model()
 
+    # Decoded here rather than inside model.transcribe() so that a bad
+    # upload can be told apart from a fault in the model: the first is
+    # the caller's problem, the second is ours.
+    try:
+        audio = decode_audio(path, sampling_rate=model.feature_extractor.sampling_rate)
+    except (av.error.FFmpegError, IndexError) as exc:
+        # IndexError: a valid container with no audio stream in it.
+        raise AudioDecodeError("Recording could not be decoded as audio") from exc
+
     segments, info = model.transcribe(
-        path,
+        audio,
         # Voice activity detection drops silence, which matters here:
         # consultations have long pauses while the vet examines the
         # animal, and Whisper is prone to hallucinating text over silence.
@@ -50,30 +84,17 @@ def transcribe_file(path: str) -> TranscriptionResult:
         language="en",
     )
 
-    collected: list[dict] = []
-    parts: list[str] = []
-
+    collected: list[Segment] = []
     for segment in segments:
         text = segment.text.strip()
         if not text:
             continue
-        parts.append(text)
         collected.append(
-            {
-                "start": round(segment.start, 2),
-                "end": round(segment.end, 2),
-                "text": text,
-                # No speaker diarisation yet. Separating vet from owner
-                # needs pyannote, which requires a Hugging Face token and
-                # considerably more compute. Timings are kept so a
-                # proposed field can be traced back to its moment in the
-                # audio, which is most of the value.
-                "speaker": None,
-            }
+            Segment(start=round(segment.start, 2), end=round(segment.end, 2), text=text)
         )
 
     return TranscriptionResult(
-        text=" ".join(parts),
+        text=" ".join(s.text for s in collected),
         segments=collected,
         language=info.language,
         duration=info.duration,

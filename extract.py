@@ -6,19 +6,16 @@ A fabricated dose in a prescription field is dangerous in a way a wrong
 summary is not, so the prompt, the schema, and the post-processing all
 push toward returning nothing rather than guessing.
 
-The provider sits behind one function so it can be swapped, or compared.
-Measuring extraction quality across providers on the same transcripts is
-a more interesting thing to be able to report than picking one and
-hoping.
+The model call itself lives in llm.py; this module owns the prompt, the
+schema, and the parsing.
 """
 
 import json
-import os
 
 from pydantic import BaseModel, Field
 
-PROVIDER = os.environ.get("LLM_PROVIDER", "gemini")
-MODEL = os.environ.get("EXTRACTION_MODEL", "gemini-2.5-flash")
+import config
+import llm
 
 
 class ProposedMedication(BaseModel):
@@ -86,122 +83,27 @@ Return only a JSON object of this shape, with no prose or code fences:
 
 
 def extract_note(transcript: str) -> ProposedNote:
-    user_prompt = f"<transcript>\n{transcript}\n</transcript>"
+    """
+    Raises llm.LLMError (or its LLMTimeoutError subclass) if the model
+    cannot be reached. A reply that arrives but cannot be parsed degrades
+    to an empty proposal instead — see _parse.
+    """
+    if config.llm_provider() == "mock":
+        # No API call: an empty proposal, the same thing a real model
+        # should return for a transcript with nothing clinical in it.
+        return _parse("{}")
 
-    if PROVIDER == "gemini":
-        raw = _generate_gemini(SYSTEM_PROMPT, user_prompt)
-    elif PROVIDER == "anthropic":
-        raw = _generate_anthropic(SYSTEM_PROMPT, user_prompt)
-    elif PROVIDER == "ollama":
-        raw = _generate_ollama(SYSTEM_PROMPT, user_prompt)
-    else:
-        raise ValueError(f"Unknown LLM_PROVIDER: {PROVIDER}")
-
-    return _parse(raw)
-
-
-def _generate_gemini(system: str, user: str) -> str:
-    import time
-
-    from google import genai
-    from google.genai import types
-
-    # Reads GEMINI_API_KEY from the environment.
-    client = genai.Client()
-
-    config = types.GenerateContentConfig(
-        system_instruction=system,
-        # Near-zero temperature: this is extraction, and variation
-        # between runs on the same audio is a defect, not a feature.
+    raw = llm.generate_json(
+        model=config.extraction_model(),
+        system=SYSTEM_PROMPT,
+        contents=f"<transcript>\n{transcript}\n</transcript>",
+        # Zero temperature: this is extraction, and variation between
+        # runs on the same audio is a defect, not a feature.
         temperature=0,
         max_output_tokens=4000,
-        # Constrains the decoder to emit valid JSON, which removes a
-        # whole class of parse failure before it happens.
-        response_mime_type="application/json",
+        attempts=4,
     )
-
-    # The free tier returns 503 under load often enough that a single
-    # attempt is not a fair test of the model. Retry with backoff so an
-    # evaluation run measures extraction quality rather than Google's
-    # capacity on the afternoon you happened to run it.
-    last_error: Exception | None = None
-    for attempt in range(4):
-        try:
-            response = client.models.generate_content(
-                model=MODEL, contents=user, config=config
-            )
-            text = _text_from(response)
-            if text.strip():
-                return text
-            last_error = RuntimeError("Model returned no text")
-        except Exception as exc:  # noqa: BLE001 - retried below
-            last_error = exc
-            if "503" not in str(exc) and "UNAVAILABLE" not in str(exc):
-                raise
-        time.sleep(2 ** attempt)
-
-    raise RuntimeError(f"Gemini failed after retries: {last_error}")
-
-
-def _text_from(response) -> str:
-    """
-    Pulls text out of a response that may also contain thinking parts.
-
-    Newer Gemini models return reasoning alongside the answer, and
-    `response.text` warns when it has to skip non-text parts. Reading the
-    parts directly avoids the warning and, more importantly, avoids
-    returning an empty string when the model spent its whole output
-    budget thinking.
-    """
-    if getattr(response, "text", None):
-        return response.text
-
-    parts = []
-    for candidate in getattr(response, "candidates", []) or []:
-        content = getattr(candidate, "content", None)
-        for part in getattr(content, "parts", []) or []:
-            if getattr(part, "thought", False):
-                continue
-            if getattr(part, "text", None):
-                parts.append(part.text)
-    return "".join(parts)
-
-
-def _generate_anthropic(system: str, user: str) -> str:
-    import anthropic
-
-    client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
-    response = client.messages.create(
-        model=MODEL,
-        max_tokens=2000,
-        temperature=0,
-        system=system,
-        messages=[{"role": "user", "content": user}],
-    )
-    return "".join(b.text for b in response.content if b.type == "text")
-
-
-def _generate_ollama(system: str, user: str) -> str:
-    """Local model, for running the pipeline with no API at all."""
-    import httpx
-
-    host = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
-    response = httpx.post(
-        f"{host}/api/chat",
-        json={
-            "model": MODEL,
-            "messages": [
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-            "format": "json",
-            "stream": False,
-            "options": {"temperature": 0},
-        },
-        timeout=180,
-    )
-    response.raise_for_status()
-    return response.json()["message"]["content"]
+    return _parse(raw)
 
 
 def _parse(text: str) -> ProposedNote:

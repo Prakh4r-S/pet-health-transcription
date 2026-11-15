@@ -1,0 +1,3 @@
+# Everything needed to run the test suite. Not installed in the image.
+-r requirements.txt
+pytest==9.2.0

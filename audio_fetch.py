@@ -17,15 +17,14 @@ from contextlib import suppress
 
 import httpx
 
+import config
+
 MAX_AUDIO_BYTES = 60 * 1024 * 1024
 MAX_REDIRECTS = 5
 # Read timeout is per chunk, so a server dripping bytes could hold a
 # request open indefinitely without an overall deadline as well.
 DOWNLOAD_TIMEOUT_SECONDS = 120
 TIMEOUT = httpx.Timeout(60.0, connect=10.0)
-
-DEFAULT_ALLOWED_HOSTS = "*.public.blob.vercel-storage.com,*.blob.vercel-storage.com"
-
 
 class AudioFetchError(Exception):
     """A fetch failure that maps directly onto an HTTP error response."""
@@ -36,17 +35,8 @@ class AudioFetchError(Exception):
         self.detail = detail
 
 
-def _allowed_hosts() -> list[str]:
-    raw = os.environ.get("ALLOWED_AUDIO_HOSTS") or DEFAULT_ALLOWED_HOSTS
-    return [h.strip().lower().rstrip(".") for h in raw.split(",") if h.strip()]
-
-
-def _allow_local() -> bool:
-    return os.environ.get("ALLOW_LOCAL_AUDIO", "").strip().lower() == "true"
-
-
 def _host_allowed(host: str) -> bool:
-    for pattern in _allowed_hosts():
+    for pattern in config.allowed_audio_hosts():
         if pattern.startswith("*."):
             # "*.example.com" matches subdomains only, not the apex.
             if host.endswith(pattern[1:]) and len(host) > len(pattern) - 1:
@@ -84,7 +74,7 @@ async def validate_audio_url(url: httpx.URL) -> None:
     (e.g. http://localhost:9000/sample.webm). Public hosts still have to
     be on the allowlist.
     """
-    allow_local = _allow_local()
+    allow_local = config.allow_local_audio()
 
     if url.scheme != "https" and not (allow_local and url.scheme == "http"):
         raise AudioFetchError(400, "Audio URL must use HTTPS")

@@ -2,10 +2,13 @@ fastapi==0.118.0
 uvicorn[standard]==0.37.0
 pydantic==2.11.9
 httpx==0.28.1
-requests==2.32.3
 faster-whisper==1.2.0
+# faster-whisper does not pin PyAV, and 19.x removed an argument it
+# passes when opening audio — every transcription fails with a TypeError.
+# Lift this pin only alongside a faster-whisper release that supports it.
+av==18.1.0
+# Not imported by this service, but faster-whisper imports it without
+# declaring it as a dependency. Without this line it arrives only by
+# accident, as a dependency of google-genai.
+requests==2.32.3
 google-genai==1.46.0
-python-multipart==0.0.20
-
-# Only needed if LLM_PROVIDER=anthropic
-# anthropic==0.69.0

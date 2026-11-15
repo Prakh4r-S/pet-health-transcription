@@ -9,20 +9,24 @@ lookup, "what's wrong with Bruno" is a consultation, and conflating them
 would be both useless and unsafe.
 """
 
-import os
+import json
+from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-MODEL = os.environ.get("CHAT_MODEL", os.environ.get("EXTRACTION_MODEL", "gemini-3.6-flash"))
+import config
+import llm
+
+MAX_QUESTION_CHARS = 4000
 
 
 class ChatTurn(BaseModel):
-    role: str  # "user" or "assistant"
+    role: Literal["user", "assistant"]
     content: str
 
 
 class ChatRequest(BaseModel):
-    question: str
+    question: str = Field(max_length=MAX_QUESTION_CHARS)
     context: str
     history: list[ChatTurn] = []
 
@@ -87,10 +91,17 @@ had to decline.
 
 
 def answer_question(request: ChatRequest) -> ChatResponse:
-    from google import genai
-    from google.genai import types
+    """
+    Raises llm.LLMError (or its LLMTimeoutError subclass) if the model
+    cannot be reached.
+    """
+    if config.llm_provider() == "mock":
+        return ChatResponse(
+            answer="This is a mock answer; no model was called.",
+            suggests_consultation=False,
+        )
 
-    client = genai.Client()
+    from google.genai import types
 
     # History is included so follow-ups work ("what about her?"), but the
     # records block is re-sent every turn rather than relying on the
@@ -116,37 +127,17 @@ def answer_question(request: ChatRequest) -> ChatResponse:
         )
     )
 
-    response = client.models.generate_content(
-        model=MODEL,
+    raw = llm.generate_json(
+        model=config.chat_model(),
+        system=SYSTEM_PROMPT,
         contents=conversation,
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            temperature=0.2,
-            max_output_tokens=1500,
-            response_mime_type="application/json",
-        ),
+        temperature=0.2,
+        max_output_tokens=1500,
     )
-
-    return _parse(_text_from(response))
-
-
-def _text_from(response) -> str:
-    if getattr(response, "text", None):
-        return response.text
-    parts = []
-    for candidate in getattr(response, "candidates", []) or []:
-        content = getattr(candidate, "content", None)
-        for part in getattr(content, "parts", []) or []:
-            if getattr(part, "thought", False):
-                continue
-            if getattr(part, "text", None):
-                parts.append(part.text)
-    return "".join(parts)
+    return _parse(raw)
 
 
 def _parse(text: str) -> ChatResponse:
-    import json
-
     cleaned = text.strip()
     if cleaned.startswith("```"):
         cleaned = cleaned.split("```")[1]
