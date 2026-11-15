@@ -55,6 +55,9 @@ across providers on the same transcripts.
 | `EXTRACTION_MODEL` | Model name, e.g. `gemini-3.6-flash` |
 | `WHISPER_MODEL` | `tiny`, `base`, `small`, `medium` (deployment uses `tiny` to fit 512 MB) |
 | `LLM_PROVIDER` | `gemini` (default), `anthropic`, `ollama` |
+| `ALLOWED_AUDIO_HOSTS` | Comma-separated hosts recordings may be fetched from; `*.` prefix matches subdomains. Default `*.public.blob.vercel-storage.com,*.blob.vercel-storage.com` |
+| `ALLOW_LOCAL_AUDIO` | `true` permits plain HTTP and private/loopback hosts. Local testing only — never set in production |
+| `MAX_CONCURRENT_TRANSCRIPTIONS` | Whisper runs allowed at once per instance (default `2`); further requests queue |
 
 This service holds no user context and makes no authorisation decisions
 of its own — the calling application establishes that the requester is
