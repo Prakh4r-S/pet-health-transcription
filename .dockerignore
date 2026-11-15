@@ -1,0 +1,41 @@
+# Version control and editor state
+.git
+.gitignore
+.DS_Store
+.vscode
+.idea
+
+# Secrets. Configuration reaches the container through Cloud Run, never
+# through the image.
+.env
+.env.*
+
+# Python caches and virtualenvs
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.venv
+venv
+
+# Evaluation harness and its cases are not part of the service
+eval/
+
+# Local test artifacts
+tests/
+*.webm
+*.wav
+*.mp3
+*.m4a
+*.ogg
+*.log
+tmp/
+
+# Deployment files and docs are not needed inside the image
+Dockerfile
+.dockerignore
+.gcloudignore
+service.yaml
+deploy.sh
+*.md

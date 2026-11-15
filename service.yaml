@@ -1,0 +1,71 @@
+# Cloud Run service definition (Knative serving spec).
+#
+# Declarative equivalent of deploy.sh — use one or the other, and keep the
+# two in step if you change limits. Replace the image reference, then:
+#
+#   gcloud run services replace service.yaml --region REGION
+#
+# This file does not grant public access. The service authenticates
+# callers itself with a bearer token, so it has to be reachable:
+#
+#   gcloud run services add-iam-policy-binding pet-health-transcription \
+#     --region REGION --member=allUsers --role=roles/run.invoker
+#
+# The service's runtime service account needs
+# roles/secretmanager.secretAccessor on both secrets below.
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: pet-health-transcription
+spec:
+  template:
+    metadata:
+      annotations:
+        # Scale to zero when idle; cap the bill when busy.
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "3"
+        # Extra CPU while the container starts, which is when the Whisper
+        # weights are loaded.
+        run.googleapis.com/startup-cpu-boost: "true"
+    spec:
+      # Requests per instance. Only MAX_CONCURRENT_TRANSCRIPTIONS of them
+      # run Whisper at once; the rest are chat calls or queued
+      # transcriptions, each holding at most one downloaded recording.
+      containerConcurrency: 10
+      timeoutSeconds: 300
+      containers:
+        - image: REGION-docker.pkg.dev/PROJECT_ID/REPOSITORY/pet-health-transcription:TAG
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "2"
+              # /tmp is RAM-backed on Cloud Run, so downloaded audio counts
+              # against this alongside the model and decoded PCM.
+              memory: 2Gi
+          env:
+            - name: MAX_CONCURRENT_TRANSCRIPTIONS
+              value: "2"
+            - name: ALLOWED_AUDIO_HOSTS
+              value: "*.public.blob.vercel-storage.com,*.blob.vercel-storage.com"
+            - name: SERVICE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: SERVICE_API_KEY
+                  key: latest
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: GEMINI_API_KEY
+                  key: latest
+          # The port opens before the Whisper model has finished loading.
+          # Holding traffic until /ready answers 200 keeps the first
+          # request from landing on a half-started instance, and keeps
+          # CPU allocated while the model loads. Allows up to 120 s.
+          startupProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 24

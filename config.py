@@ -67,6 +67,10 @@ def whisper_model() -> str:
     # vocabulary and roughly three times slower; "medium" needs more RAM
     # than most small instances allow. Set via env so the trade-off can be
     # measured rather than guessed at.
+    #
+    # Keep this default equal to the Dockerfile's WHISPER_MODEL build
+    # arg. The image bakes in exactly one model and runs offline, so a
+    # different name at runtime will fail to load rather than download.
     return _get("WHISPER_MODEL", "base")
 
 
@@ -81,6 +85,10 @@ def allowed_audio_hosts() -> list[str]:
 
 def allow_local_audio() -> bool:
     return _get("ALLOW_LOCAL_AUDIO").lower() == "true"
+
+
+def log_level() -> str:
+    return _get("LOG_LEVEL", "INFO").upper()
 
 
 def validate() -> None:

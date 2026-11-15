@@ -22,6 +22,7 @@ import llm
 from audio_fetch import AudioFetchError, download_audio
 from chat import ChatRequest, ChatResponse, answer_question
 from extract import ProposedNote, extract_note
+from observability import RequestLogMiddleware, annotate, configure_logging
 from transcribe import (
     AudioDecodeError,
     Segment,
@@ -31,6 +32,7 @@ from transcribe import (
     transcribe_file,
 )
 
+configure_logging()
 logger = logging.getLogger(__name__)
 
 # Each running transcription holds the decoded PCM for a whole recording
@@ -90,6 +92,11 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Pet Health transcription", lifespan=lifespan)
+app.add_middleware(RequestLogMiddleware)
+
+
+def _llm_label(model: str) -> str:
+    return "mock" if config.llm_provider() == "mock" else model
 
 
 @app.exception_handler(llm.LLMError)
@@ -161,6 +168,8 @@ async def transcribe(
     request: TranscribeRequest,
     _: None = Depends(require_api_key),
 ) -> TranscribeResponse:
+    annotate(whisper_model=config.whisper_model())
+
     try:
         path = await download_audio(str(request.audio_url))
     except AudioFetchError as exc:
@@ -173,9 +182,17 @@ async def transcribe(
     task = _keep(asyncio.create_task(_transcribe_and_cleanup(path)))
     result: TranscriptionResult = await asyncio.shield(task)
 
+    # Metadata only. The transcript itself is clinical conversation and
+    # never goes to the logs.
+    annotate(
+        audio_duration_s=round(result.duration, 1) if result.duration is not None else None,
+        segments=len(result.segments),
+    )
+
     if not result.text.strip():
         raise HTTPException(422, "No speech detected in the recording")
 
+    annotate(llm_model=_llm_label(config.extraction_model()))
     proposal = await asyncio.to_thread(extract_note, result.text)
 
     return TranscribeResponse(
@@ -216,4 +233,5 @@ async def chat(
     if len(request.context) > 40_000:
         raise HTTPException(413, "Context too large")
 
+    annotate(llm_model=_llm_label(config.chat_model()))
     return await asyncio.to_thread(answer_question, request)
